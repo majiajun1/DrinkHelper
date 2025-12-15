@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <!-- 进度标题 -->
+
+    <TextView
+        android:id="@+id/tv_water_title"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:text="今日喝水进度"
+    android:textSize="30sp"
+    android:textStyle="bold"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+
+    android:layout_marginTop="20dp"/>
+    <!-- 核心：水平进度条 -->
+
+
+    <TextView
+        android:id="@+id/tv_water_value"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="0ml / 2000ml"
+        android:textSize="18sp"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_water_title" />
+
+    <ProgressBar
+        android:id="@+id/pb_water"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="350dp"
+        android:layout_height="40dp"
+        android:backgroundTint="#E0E0E0"
+        android:max="2000"
+        android:progress="0"
+        android:progressTint="#4CAF50"
+
+        tools:layout_editor_absoluteX="27dp"
+        tools:layout_editor_absoluteY="118dp" />
+
+    <Button
+        android:id="@+id/set_water_button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="设置喝水量"
+        tools:layout_editor_absoluteX="145dp"
+        tools:layout_editor_absoluteY="201dp" />
+
+    <Button
+        android:id="@+id/Set_water_button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="设置喝水目标"
+        tools:layout_editor_absoluteX="16dp"
+        tools:layout_editor_absoluteY="201dp" />
+
+    <Button
+        android:id="@+id/Set_target_button"
+        android:layout_width="120dp"
+        android:layout_height="60dp"
+        android:text="增加喝水量"
+        tools:layout_editor_absoluteX="275dp"
+        tools:layout_editor_absoluteY="201dp" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>
