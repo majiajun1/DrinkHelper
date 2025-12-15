@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DrinkHelper</string>
+    <string name="water_value">%1$d ml / %2$d ml</string>
 </resources>
