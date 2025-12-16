@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.renderscript.ScriptGroup;
 import android.text.InputType;
 import android.widget.EditText;
@@ -21,13 +22,19 @@ import com.example.drinkhelper.databinding.WaterCountModuleBinding;
 public class MainActivity extends AppCompatActivity{
 
     private MainpageBinding mainpageBinding;
+    private CountDownTimer countDownTimer;
+    private int curLeftTime;
 
-
+    private int timeLength=30*60*1000;
     private Context context;
     private WaterCountModuleBinding waterCountModuleBinding;
     private TimeModuleBinding timeModuleBinding;
     private int currentWater=0;
     private int targetWater=2000; //默认目标是2000ml
+
+    private boolean isPaused=false;
+
+
 
 
     @Override
@@ -41,12 +48,108 @@ public class MainActivity extends AppCompatActivity{
         waterCountModuleBinding=mainpageBinding.includeWaterCount;
         context=this;
         initWaterProgressBar();
+        initTimer(timeLength);
 
 
-        waterCountModuleBinding.addWaterButton.setOnClickListener(v -> increaseWaterEvent());
+
+        waterCountModuleBinding.addWaterButton.setOnClickListener(v -> increaseWaterEvent(null));
         waterCountModuleBinding.setTargetButton.setOnClickListener(v -> setWaterTargetEvent());
         waterCountModuleBinding.setWaterButton.setOnClickListener(v -> setCurrentWaterEvent());
 
+
+
+        timeModuleBinding.StartButton.setOnClickListener(v -> startTimer());
+        timeModuleBinding.ResetButton.setOnClickListener(v -> resetTimer());
+        timeModuleBinding.SetTimeButton.setOnClickListener(v -> setTimeLength());
+        timeModuleBinding.PauseButton.setOnClickListener(v -> pauseTimer());
+    }
+
+
+    private void updateCountdownText(long millis) {
+        // 转换毫秒为 分:秒（比如5分钟=300000毫秒 → 05:00）
+        int minutes = (int) (millis / 1000 / 60);
+        int seconds = (int) (millis / 1000 % 60);
+
+        // 格式化：保证两位数（比如1秒→01，5分→05）
+        String timeText = String.format("%02d:%02d", minutes, seconds);
+        // 更新TextView
+        timeModuleBinding.tvCountdownTime.setText(timeText);
+    }
+
+    //countdown的问题是：countdown的计时器不能暂停，只能重新开始
+
+    private void initTimer(int inputTime)
+    {
+        curLeftTime=inputTime;
+        countDownTimer=new CountDownTimer(inputTime,1000) {
+            @Override
+            public void onFinish() {
+                initTimer(timeLength);
+                Toast.makeText(MainActivity.this, "该喝水了", Toast.LENGTH_SHORT).show();
+                confirmDrinkWaterEvent();
+
+
+            }
+
+            @Override
+            public void onTick(long millisUntilFinished) {
+                curLeftTime= Math.toIntExact(millisUntilFinished);
+                updateCountdownText(curLeftTime);
+            }
+        };
+        updateCountdownText(curLeftTime);
+    }
+
+    private void resetTimer(){
+        curLeftTime=timeLength;
+        updateCountdownText(curLeftTime);
+        isPaused=false;
+        pauseTimer();
+    }
+
+    private void startTimer(){
+        if(countDownTimer!=null){
+           if(isPaused)
+           {
+                initTimer(curLeftTime);
+                countDownTimer.start();
+               isPaused = false; // 取消暂停标记
+               Toast.makeText(this, "倒计时已恢复/开始", Toast.LENGTH_SHORT).show();
+           }else {
+               countDownTimer.start();
+           }
+
+        }
+        else
+        {
+            initTimer(curLeftTime);
+            startTimer();
+        }
+    }
+
+    private void pauseTimer(){
+        if(countDownTimer!=null && !isPaused)
+        {
+            countDownTimer.cancel();
+            isPaused=true;
+            Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void setTimeLength(){
+        showInputDialog(this, "设定时间间隔（分钟）", "请输入时间间隔（注意：时间会重置）", 30, new OnInputConfirmListener() {
+            @Override
+            public void onConfirm(double inputValue) {
+                // 输入确认，更新目标值
+
+                timeLength= (int) (inputValue*60*1000);
+
+                resetTimer();
+            }
+
+
+
+        });
     }
 
 
@@ -72,16 +175,85 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
-    private void increaseWaterEvent(){
+    private void increaseWaterEvent(OnWaterIncreasedListener listener){
          showInputDialog(this, "增加喝水（ml）", "请输入增加量", 200, new OnInputConfirmListener() {
              @Override
-             public void onConfirm(int inputValue) {
+             public void onConfirm(double inputValue) {
                  // 输入确认，更新目标值
-                 currentWater+=inputValue;
+                 currentWater+=(int)  inputValue;
                  setCurrentWater(currentWater);
                  Toast.makeText(MainActivity.this, "已增加" + inputValue + "ml", Toast.LENGTH_SHORT).show();
+                 if(currentWater>=targetWater)
+                 {
+                     Toast.makeText(MainActivity.this, "已喝满！", Toast.LENGTH_SHORT).show();
+
+                 }
+
+                 if(listener!=null)
+                 {
+                     listener.onWaterIncreased();
+                 }
              }
          });
+    }
+
+    private void confirmDrinkWaterEvent(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        // 弹窗标题和提示语（可根据你的需求修改）
+        builder.setTitle("喝水提醒")
+                .setMessage("倒计时结束啦，该喝水了！")
+                // 选项1：下次再喝
+                .setNeutralButton("下次再喝", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // 1. 先关闭弹窗（可选：也可以等输入完成后关，看你交互需求）
+                        dialog.dismiss();
+
+
+                    }
+                })
+                // 选项2：马上喝水
+                .setPositiveButton("马上喝水", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // --------------------------
+                        // 你需要实现的逻辑：马上喝水
+                        // 示例：更新喝水量、刷新UI、重置倒计时等
+                        // 2. 调用增加水量方法，通过回调执行倒计时逻辑（解耦）
+                        increaseWaterEvent(new OnWaterIncreasedListener() {
+                            @Override
+                            public void onWaterIncreased() {
+                                // 输入水量确认后，再重启倒计时
+                                startTimer();
+                            }
+                        });
+
+                        // --------------------------
+                        // 关闭弹窗（必须保留）
+                        dialog.dismiss();
+                    }
+                })
+                // 选项3：暂停倒计时
+                .setNegativeButton("暂停倒计时", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // --------------------------
+                        // 你需要实现的逻辑：暂停倒计时
+                        // 示例：调用pauseTimer()等
+                        pauseTimer();
+                        // --------------------------
+                        // 关闭弹窗（必须保留）
+                        dialog.dismiss();
+                    }
+                })
+                // 禁止点击外部关闭弹窗（可选，根据你的需求决定是否保留）
+                .setCancelable(false);
+
+
+        // 2. 创建并显示对话框
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
     }
 
 
@@ -102,9 +274,9 @@ public class MainActivity extends AppCompatActivity{
         showInputDialog(this, "设置目标（ml）", "请输入目标值", targetWater, new OnInputConfirmListener() {
 
             @Override
-            public void onConfirm(int inputValue) {
+            public void onConfirm(double inputValue) {
                 // 输入确认，更新目标值
-                targetWater=inputValue;
+                targetWater=(int)   inputValue;
                 setTargetWater(targetWater);
                 Toast.makeText(MainActivity.this, "目标已更新为" + targetWater, Toast.LENGTH_SHORT).show();
             }
@@ -116,9 +288,9 @@ public class MainActivity extends AppCompatActivity{
         showInputDialog(this, "设置当前值（ml）", "请输入当前值", currentWater, new OnInputConfirmListener() {
 
             @Override
-            public void onConfirm(int inputValue) {
+            public void onConfirm(double    inputValue) {
                 // 输入确认，更新目标值
-                currentWater=inputValue;
+                currentWater=(int) inputValue;
                 setCurrentWater(currentWater);
                 Toast.makeText(MainActivity.this, "当前已更新为" + currentWater, Toast.LENGTH_SHORT).show();
             }
@@ -133,7 +305,7 @@ public class MainActivity extends AppCompatActivity{
         // 1. 创建EditText输入框
         EditText editText = new EditText(context);
         // 设置输入类型为数字（仅允许输入整数）
-        editText.setInputType(InputType.TYPE_CLASS_NUMBER);
+        editText.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         // 设置提示文字和默认值
         editText.setHint(hint);
         editText.setText(String.valueOf(defaultValue));
@@ -153,10 +325,10 @@ public class MainActivity extends AppCompatActivity{
                             Toast.makeText(context, "输入不能为空！", Toast.LENGTH_SHORT).show();
                             return;
                         }
-                        int inputValue;
+                        double inputValue;
                         try {
                             // 转换为整数
-                            inputValue = Integer.parseInt(inputStr);
+                                inputValue = Double.parseDouble(inputStr);
                             // 业务校验：比如不能小于0
                             if (inputValue <= 0) {
                                 Toast.makeText(context, "请输入大于0的数字！", Toast.LENGTH_SHORT).show();
@@ -185,7 +357,15 @@ public class MainActivity extends AppCompatActivity{
 
 
     public interface OnInputConfirmListener {
-        void onConfirm(int inputValue);
+        void onConfirm(double inputValue);
+
+
+    }
+
+
+    // 定义回调接口：输入水量确认后触发
+    public interface OnWaterIncreasedListener {
+        void onWaterIncreased(); // 水量增加完成后的回调
     }
 
 
