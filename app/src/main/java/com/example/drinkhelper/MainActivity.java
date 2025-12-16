@@ -4,11 +4,18 @@ import static android.app.ProgressDialog.show;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.renderscript.ScriptGroup;
 import android.text.InputType;
 import android.widget.EditText;
@@ -34,6 +41,7 @@ public class MainActivity extends AppCompatActivity{
 
     private boolean isPaused=false;
 
+    private Vibrator vibrator;
 
 
 
@@ -46,10 +54,11 @@ public class MainActivity extends AppCompatActivity{
         setContentView(mainpageBinding.getRoot());
         timeModuleBinding=mainpageBinding.includeCountdown;
         waterCountModuleBinding=mainpageBinding.includeWaterCount;
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         context=this;
         initWaterProgressBar();
         initTimer(timeLength);
-
+        checkAndRequestVibratePermission();
 
 
         waterCountModuleBinding.addWaterButton.setOnClickListener(v -> increaseWaterEvent(null));
@@ -86,7 +95,9 @@ public class MainActivity extends AppCompatActivity{
             public void onFinish() {
                 initTimer(timeLength);
                 Toast.makeText(MainActivity.this, "该喝水了", Toast.LENGTH_SHORT).show();
+                timesUpAlertSoundEvent();
                 confirmDrinkWaterEvent();
+
 
 
             }
@@ -153,6 +164,39 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+    private void timesUpAlertSoundEvent()  // 震动功能
+    {
+        if (vibrator == null || !vibrator.hasVibrator()) {
+            Toast.makeText(this, "设备不支持震动", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // 模式1：简单短震动（震动500毫秒，适合提醒）【推荐】
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            // Android 8.0+ 新API（推荐）
+            VibrationEffect vibrationEffect = VibrationEffect.createOneShot(2000, VibrationEffect.DEFAULT_AMPLITUDE);
+            vibrator.vibrate(vibrationEffect);
+        } else {
+            // 兼容8.0以下系统
+            vibrator.vibrate(500); // 参数：震动时长（毫秒）
+        }
+    }
+
+    private void checkAndRequestVibratePermission() {
+        // Android 13+ 需要动态申请VIBRATE权限，低版本无需
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) { // TIRAMISU = API 33（Android 13）
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.VIBRATE)
+                    != PackageManager.PERMISSION_GRANTED) {
+                // 未授权，动态申请
+                ActivityCompat.requestPermissions(
+                        this,
+                        new String[]{Manifest.permission.VIBRATE},
+                        1001
+                );
+            }
+        }
+    }
+
 
     private void initWaterProgressBar(){
         setTargetWater(targetWater);
@@ -208,6 +252,7 @@ public class MainActivity extends AppCompatActivity{
                     public void onClick(DialogInterface dialog, int which) {
                         // 1. 先关闭弹窗（可选：也可以等输入完成后关，看你交互需求）
                         dialog.dismiss();
+                        startTimer();
 
 
                     }
