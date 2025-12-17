@@ -1,4 +1,4 @@
-package com.example.drinkhelper;
+package com.example.drinkhelper.view;
 
 import static android.app.ProgressDialog.show;
 
@@ -6,6 +6,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.Manifest;
 import android.content.Context;
@@ -13,37 +14,29 @@ import android.content.DialogInterface;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
-import android.renderscript.ScriptGroup;
 import android.text.InputType;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.example.drinkhelper.R;
 import com.example.drinkhelper.databinding.MainpageBinding;
 import com.example.drinkhelper.databinding.TimeModuleBinding;
 import com.example.drinkhelper.databinding.WaterCountModuleBinding;
-
+import com.example.drinkhelper.viewmodel.TimerViewModel;
+import com.example.drinkhelper.viewmodel.WaterViewModel;
 
 public class MainActivity extends AppCompatActivity{
 
     private MainpageBinding mainpageBinding;
-    private CountDownTimer countDownTimer;
-    private int curLeftTime;
-
-    private int timeLength=30*60*1000;
     private Context context;
     private WaterCountModuleBinding waterCountModuleBinding;
     private TimeModuleBinding timeModuleBinding;
-    private int currentWater=0;
-    private int targetWater=2000; //默认目标是2000ml
-
-    private boolean isPaused=false;
-
     private Vibrator vibrator;
 
-
+    private WaterViewModel waterViewModel;
+    private TimerViewModel timerViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -56,97 +49,78 @@ public class MainActivity extends AppCompatActivity{
         waterCountModuleBinding=mainpageBinding.includeWaterCount;
         vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
         context=this;
-        initWaterProgressBar();
-        initTimer(timeLength);
         checkAndRequestVibratePermission();
 
+        waterViewModel = new ViewModelProvider(this).get(WaterViewModel.class);
+        timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
+
+        waterViewModel.getTargetWater().observe(this, value -> {
+            if (value != null) {
+                waterCountModuleBinding.pbWater.setMax(value);
+                Integer cur = waterViewModel.getCurrentWater().getValue();
+                if (cur == null) {
+                    cur = 0;
+                }
+                updateWaterDisplay(cur, value);
+            }
+        });
+        waterViewModel.getCurrentWater().observe(this, value -> {
+            if (value != null) {
+                waterCountModuleBinding.pbWater.setProgress(value);
+                Integer target = waterViewModel.getTargetWater().getValue();
+                if (target == null) target = 0;
+                updateWaterDisplay(value, target);
+            }
+        });
+
+        timerViewModel.getRemainingMillis().observe(this, millis -> {
+            if (millis != null) {
+                updateCountdownText(millis);
+            }
+        });
+        timerViewModel.getTimerFinishedEvent().observe(this, finished -> {
+            if (Boolean.TRUE.equals(finished)) {
+                Toast.makeText(MainActivity.this, "该喝水了", Toast.LENGTH_SHORT).show();
+                timesUpAlertSoundEvent();
+                confirmDrinkWaterEvent();
+                timerViewModel.ackFinishEvent();
+            }
+        });
 
         waterCountModuleBinding.addWaterButton.setOnClickListener(v -> increaseWaterEvent(null));
         waterCountModuleBinding.setTargetButton.setOnClickListener(v -> setWaterTargetEvent());
         waterCountModuleBinding.setWaterButton.setOnClickListener(v -> setCurrentWaterEvent());
 
-
-
-        timeModuleBinding.StartButton.setOnClickListener(v -> startTimer());
-        timeModuleBinding.ResetButton.setOnClickListener(v -> resetTimer());
+        timeModuleBinding.StartButton.setOnClickListener(v -> {
+            timerViewModel.start();
+            Toast.makeText(this, "倒计时已开始", Toast.LENGTH_SHORT).show();
+        });
+        timeModuleBinding.ResetButton.setOnClickListener(v -> {
+            timerViewModel.reset();
+        });
         timeModuleBinding.SetTimeButton.setOnClickListener(v -> setTimeLength());
-        timeModuleBinding.PauseButton.setOnClickListener(v -> pauseTimer());
+        timeModuleBinding.PauseButton.setOnClickListener(v -> {
+            timerViewModel.pause();
+            Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
+        });
     }
 
 
-    private void updateCountdownText(long millis) {
-        // 转换毫秒为 分:秒（比如5分钟=300000毫秒 → 05:00）
+    private void updateCountdownText(int millis) {
         int minutes = (int) (millis / 1000 / 60);
         int seconds = (int) (millis / 1000 % 60);
-
-        // 格式化：保证两位数（比如1秒→01，5分→05）
         String timeText = String.format("%02d:%02d", minutes, seconds);
-        // 更新TextView
         timeModuleBinding.tvCountdownTime.setText(timeText);
-    }
-
-    //countdown的问题是：countdown的计时器不能暂停，只能重新开始
-
-    private void initTimer(int inputTime)
-    {
-        curLeftTime=inputTime;
-        countDownTimer=new CountDownTimer(curLeftTime,1000) {
-            @Override
-            public void onFinish() {
-                initTimer(timeLength);
-                Toast.makeText(MainActivity.this, "该喝水了", Toast.LENGTH_SHORT).show();
-                timesUpAlertSoundEvent();
-                confirmDrinkWaterEvent();
-
-
-
-            }
-
-            @Override
-            public void onTick(long millisUntilFinished) {
-                curLeftTime= Math.toIntExact(millisUntilFinished);
-                updateCountdownText(curLeftTime);
-            }
-        };
-        updateCountdownText(curLeftTime);
-    }
-
-    private void resetTimer(){
-        curLeftTime=timeLength;
-        updateCountdownText(curLeftTime);
-        isPaused=false;
-        pauseTimer();
-    }
-
-    private void startTimer(){
-        initTimer(curLeftTime);
-        countDownTimer.start();
-        Toast.makeText(this, "倒计时已开始", Toast.LENGTH_SHORT).show();
-        isPaused=false;
-    }
-
-    private void pauseTimer(){
-        if(countDownTimer!=null && !isPaused)
-        {
-            countDownTimer.cancel();
-            isPaused=true;
-            Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
-        }
     }
 
     private void setTimeLength(){
         showInputDialog(this, "设定时间间隔（分钟）", "请输入时间间隔（注意：时间会重置）", 30, new OnInputConfirmListener() {
             @Override
             public void onConfirm(double inputValue) {
-                // 输入确认，更新目标值
-
-                timeLength= (int) (inputValue*60*1000);
-
-                resetTimer();
+                int minutes = (int) inputValue;
+                timerViewModel.setTimeLengthMinutes(minutes);
+                timerViewModel.reset();
             }
-
-
-
         });
     }
 
@@ -186,23 +160,17 @@ public class MainActivity extends AppCompatActivity{
 
 
     private void initWaterProgressBar(){
-        setTargetWater(targetWater);
-        setCurrentWater(currentWater);
-        updateWaterDisplay(currentWater, targetWater);
-    }
-
-    private void setTargetWater(int targetWater){
-        this.targetWater=targetWater;
-
-        waterCountModuleBinding.pbWater.setMax(targetWater);
-        updateWaterDisplay(currentWater, targetWater);
-    }
-
-    private void setCurrentWater(int currentWater){
-        this.currentWater=currentWater;
-
-        waterCountModuleBinding.pbWater.setProgress(currentWater);
-        updateWaterDisplay(currentWater, targetWater);
+        Integer target = waterViewModel.getTargetWater().getValue();
+        Integer cur = waterViewModel.getCurrentWater().getValue();
+        if (target == null) {
+            target = 2000;
+        }
+        if (cur == null) {
+            cur = 0;
+        }
+        waterCountModuleBinding.pbWater.setMax(target);
+        waterCountModuleBinding.pbWater.setProgress(cur);
+        updateWaterDisplay(cur, target);
     }
 
 
@@ -210,14 +178,12 @@ public class MainActivity extends AppCompatActivity{
          showInputDialog(this, "增加喝水（ml）", "请输入增加量", 200, new OnInputConfirmListener() {
              @Override
              public void onConfirm(double inputValue) {
-                 // 输入确认，更新目标值
-                 currentWater+=(int)  inputValue;
-                 setCurrentWater(currentWater);
+                 waterViewModel.increase((int) inputValue);
                  Toast.makeText(MainActivity.this, "已增加" + inputValue + "ml", Toast.LENGTH_SHORT).show();
-                 if(currentWater>=targetWater)
-                 {
+                 Integer cur = waterViewModel.getCurrentWater().getValue();
+                 Integer target = waterViewModel.getTargetWater().getValue();
+                 if (cur != null && target != null && cur >= target) {
                      Toast.makeText(MainActivity.this, "已喝满！", Toast.LENGTH_SHORT).show();
-
                  }
 
                  if(listener!=null)
@@ -230,59 +196,40 @@ public class MainActivity extends AppCompatActivity{
 
     private void confirmDrinkWaterEvent(){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        // 弹窗标题和提示语（可根据你的需求修改）
         builder.setTitle("喝水提醒")
                 .setMessage("倒计时结束啦，该喝水了！")
-                // 选项1：下次再喝
                 .setNeutralButton("下次再喝", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // 1. 先关闭弹窗（可选：也可以等输入完成后关，看你交互需求）
                         dialog.dismiss();
-                        startTimer();
+                        timerViewModel.start();
 
 
                     }
                 })
-                // 选项2：马上喝水
                 .setPositiveButton("马上喝水", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // --------------------------
-                        // 你需要实现的逻辑：马上喝水
-                        // 示例：更新喝水量、刷新UI、重置倒计时等
-                        // 2. 调用增加水量方法，通过回调执行倒计时逻辑（解耦）
                         increaseWaterEvent(new OnWaterIncreasedListener() {
                             @Override
                             public void onWaterIncreased() {
-                                // 输入水量确认后，再重启倒计时
-                                startTimer();
+                                timerViewModel.start();
                             }
                         });
 
-                        // --------------------------
-                        // 关闭弹窗（必须保留）
                         dialog.dismiss();
                     }
                 })
-                // 选项3：暂停倒计时
                 .setNegativeButton("暂停倒计时", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        // --------------------------
-                        // 你需要实现的逻辑：暂停倒计时
-                        // 示例：调用pauseTimer()等
-                        pauseTimer();
-                        // --------------------------
-                        // 关闭弹窗（必须保留）
+                        timerViewModel.pause();
                         dialog.dismiss();
                     }
                 })
-                // 禁止点击外部关闭弹窗（可选，根据你的需求决定是否保留）
                 .setCancelable(false);
 
 
-        // 2. 创建并显示对话框
         AlertDialog dialog = builder.create();
         dialog.show();
 
@@ -303,28 +250,44 @@ public class MainActivity extends AppCompatActivity{
 
     private void setWaterTargetEvent()
     {
-        showInputDialog(this, "设置目标（ml）", "请输入目标值", targetWater, new OnInputConfirmListener() {
+        Integer defaultTarget = waterViewModel.getTargetWater().getValue();
+        if (defaultTarget == null) {
+            defaultTarget = 2000;
+        }
+        showInputDialog(this, "设置目标（ml）", "请输入目标值", defaultTarget, new OnInputConfirmListener() {
 
             @Override
             public void onConfirm(double inputValue) {
-                // 输入确认，更新目标值
-                targetWater=(int)   inputValue;
-                setTargetWater(targetWater);
-                Toast.makeText(MainActivity.this, "目标已更新为" + targetWater, Toast.LENGTH_SHORT).show();
+                int target = (int) inputValue;
+                waterViewModel.setTarget(target);
+                Integer cur = waterViewModel.getCurrentWater().getValue();
+                if (cur == null) {
+                    cur = 0;
+                }
+                updateWaterDisplay(cur, target);
+                Toast.makeText(MainActivity.this, "目标已更新为" + target, Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void setCurrentWaterEvent()
     {
-        showInputDialog(this, "设置当前值（ml）", "请输入当前值", currentWater, new OnInputConfirmListener() {
+        Integer defaultCurrent = waterViewModel.getCurrentWater().getValue();
+        if (defaultCurrent == null) {
+            defaultCurrent = 0;
+        }
+        showInputDialog(this, "设置当前值（ml）", "请输入当前值", defaultCurrent, new OnInputConfirmListener() {
 
             @Override
             public void onConfirm(double    inputValue) {
-                // 输入确认，更新目标值
-                currentWater=(int) inputValue;
-                setCurrentWater(currentWater);
-                Toast.makeText(MainActivity.this, "当前已更新为" + currentWater, Toast.LENGTH_SHORT).show();
+                int cur = (int) inputValue;
+                waterViewModel.setCurrent(cur);
+                Integer target = waterViewModel.getTargetWater().getValue();
+                if (target == null) {
+                    target = 0;
+                }
+                updateWaterDisplay(cur, target);
+                Toast.makeText(MainActivity.this, "当前已更新为" + cur, Toast.LENGTH_SHORT).show();
             }
         });
     }
