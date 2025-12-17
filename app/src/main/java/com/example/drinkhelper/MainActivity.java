@@ -90,7 +90,7 @@ public class MainActivity extends AppCompatActivity{
     private void initTimer(int inputTime)
     {
         curLeftTime=inputTime;
-        countDownTimer=new CountDownTimer(inputTime,1000) {
+        countDownTimer=new CountDownTimer(curLeftTime,1000) {
             @Override
             public void onFinish() {
                 initTimer(timeLength);
@@ -119,23 +119,10 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void startTimer(){
-        if(countDownTimer!=null){
-           if(isPaused)
-           {
-                initTimer(curLeftTime);
-                countDownTimer.start();
-               isPaused = false; // 取消暂停标记
-               Toast.makeText(this, "倒计时已恢复/开始", Toast.LENGTH_SHORT).show();
-           }else {
-               countDownTimer.start();
-           }
-
-        }
-        else
-        {
-            initTimer(curLeftTime);
-            startTimer();
-        }
+        initTimer(curLeftTime);
+        countDownTimer.start();
+        Toast.makeText(this, "倒计时已开始", Toast.LENGTH_SHORT).show();
+        isPaused=false;
     }
 
     private void pauseTimer(){
