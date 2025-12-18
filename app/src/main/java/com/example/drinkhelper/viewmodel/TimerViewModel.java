@@ -43,11 +43,11 @@ public class TimerViewModel extends AndroidViewModel {
         return timerFinishedEvent;
     }
 
-    public void setTimeLengthMinutes(int minutes) {
+    public void setTimeLengthMinutes(double minutes) {
         if (minutes <= 0) {
             return;
         }
-        int millis = minutes * 60 * 1000;
+        int millis = (int) (minutes * 60 * 1000);
         timeLengthMillis.setValue(millis);
         prefs.edit().putInt("timeLengthMillis", millis).apply();
         resetInternal(millis);

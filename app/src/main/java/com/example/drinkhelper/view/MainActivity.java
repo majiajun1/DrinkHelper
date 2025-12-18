@@ -66,10 +66,12 @@ public class MainActivity extends AppCompatActivity{
         });
         waterViewModel.getCurrentWater().observe(this, value -> {
             if (value != null) {
-                waterCountModuleBinding.pbWater.setProgress(value);
+                waterCountModuleBinding.pbWater.setProgress(value);  //更新进度条
                 Integer target = waterViewModel.getTargetWater().getValue();
-                if (target == null) target = 0;
-                updateWaterDisplay(value, target);
+                if (target == null) {
+                    target = 0;
+                }
+                updateWaterDisplay(value, target); //更新数字
             }
         });
 
@@ -117,8 +119,8 @@ public class MainActivity extends AppCompatActivity{
         showInputDialog(this, "设定时间间隔（分钟）", "请输入时间间隔（注意：时间会重置）", 30, new OnInputConfirmListener() {
             @Override
             public void onConfirm(double inputValue) {
-                int minutes = (int) inputValue;
-                timerViewModel.setTimeLengthMinutes(minutes);
+
+                timerViewModel.setTimeLengthMinutes(inputValue);
                 timerViewModel.reset();
             }
         });
@@ -175,23 +177,23 @@ public class MainActivity extends AppCompatActivity{
 
 
     private void increaseWaterEvent(OnWaterIncreasedListener listener){
-         showInputDialog(this, "增加喝水（ml）", "请输入增加量", 200, new OnInputConfirmListener() {
-             @Override
-             public void onConfirm(double inputValue) {
-                 waterViewModel.increase((int) inputValue);
-                 Toast.makeText(MainActivity.this, "已增加" + inputValue + "ml", Toast.LENGTH_SHORT).show();
-                 Integer cur = waterViewModel.getCurrentWater().getValue();
-                 Integer target = waterViewModel.getTargetWater().getValue();
-                 if (cur != null && target != null && cur >= target) {
-                     Toast.makeText(MainActivity.this, "已喝满！", Toast.LENGTH_SHORT).show();
-                 }
 
-                 if(listener!=null)
-                 {
-                     listener.onWaterIncreased();
-                 }
-             }
-         });
+        String[] gap={"50", "100", "150","200", "250","300", "350", "400", "450", "500",};
+        GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 2, new GeneralPickerDialog.PickedListener() {
+            @Override
+            public void onPicked(int value) {
+                waterViewModel.increase(value);
+                Toast.makeText(MainActivity.this, "已增加" + value + "ml", Toast.LENGTH_SHORT).show();
+                Integer cur = waterViewModel.getCurrentWater().getValue();
+                Integer target = waterViewModel.getTargetWater().getValue();
+                if (cur != null && target != null && cur >= target) {
+                    Toast.makeText(MainActivity.this, "已喝满！", Toast.LENGTH_SHORT).show();
+                }
+                if (listener != null) {
+                    listener.onWaterIncreased();
+                }
+            }
+        });
     }
 
     private void confirmDrinkWaterEvent(){
