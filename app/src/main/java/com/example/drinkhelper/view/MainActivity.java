@@ -116,15 +116,33 @@ public class MainActivity extends AppCompatActivity{
     }
 
     private void setTimeLength(){
-        showInputDialog(this, "设定时间间隔（分钟）", "请输入时间间隔（注意：时间会重置）", 30, new OnInputConfirmListener() {
-            @Override
-            public void onConfirm(double inputValue) {
+//        showInputDialog(this, "设定时间间隔（分钟）", "请输入时间间隔（注意：时间会重置）", 30, new OnInputConfirmListener() {
+//            @Override
+//            public void onConfirm(double inputValue) {
+//
+//                timerViewModel.setTimeLengthMinutes(inputValue);
+//                timerViewModel.reset();
+//            }
+//        });
+        setTimeLengthByNumberPicker();
+    }
 
-                timerViewModel.setTimeLengthMinutes(inputValue);
+
+    private void setTimeLengthByNumberPicker(){
+        String[] items=new String[]{"0.1","5", "10", "15", "20", "25", "30", "35", "40", "45", "50", "55", "60","70","80","90","100","110","120"};
+        GeneralPickerDialog.show(this, "选择时间间隔（分钟）",items
+                , 5, new GeneralPickerDialog.PickedListener() {
+            @Override
+            public void onPicked(int selectionIndex) {
+                double value = Double.parseDouble(items[selectionIndex]);
+                timerViewModel.setTimeLengthMinutes(value);
                 timerViewModel.reset();
             }
         });
+
+
     }
+
 
 
     private void timesUpAlertSoundEvent()  // 震动功能
@@ -160,20 +178,7 @@ public class MainActivity extends AppCompatActivity{
         }
     }
 
-
-    private void initWaterProgressBar(){
-        Integer target = waterViewModel.getTargetWater().getValue();
-        Integer cur = waterViewModel.getCurrentWater().getValue();
-        if (target == null) {
-            target = 2000;
-        }
-        if (cur == null) {
-            cur = 0;
-        }
-        waterCountModuleBinding.pbWater.setMax(target);
-        waterCountModuleBinding.pbWater.setProgress(cur);
-        updateWaterDisplay(cur, target);
-    }
+    //删除原来的初始化进度条的接口 因为改用了viewmodel的架构
 
 
     private void increaseWaterEvent(OnWaterIncreasedListener listener){
@@ -181,7 +186,8 @@ public class MainActivity extends AppCompatActivity{
         String[] gap={"50", "100", "150","200", "250","300", "350", "400", "450", "500",};
         GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 2, new GeneralPickerDialog.PickedListener() {
             @Override
-            public void onPicked(int value) {
+            public void onPicked(int selectedIndex) {
+                int value = Integer.parseInt(gap[selectedIndex]);
                 waterViewModel.increase(value);
                 Toast.makeText(MainActivity.this, "已增加" + value + "ml", Toast.LENGTH_SHORT).show();
                 Integer cur = waterViewModel.getCurrentWater().getValue();
@@ -327,8 +333,8 @@ public class MainActivity extends AppCompatActivity{
                             // 转换为整数
                                 inputValue = Double.parseDouble(inputStr);
                             // 业务校验：比如不能小于0
-                            if (inputValue <= 0) {
-                                Toast.makeText(context, "请输入大于0的数字！", Toast.LENGTH_SHORT).show();
+                            if (inputValue < 0) {
+                                Toast.makeText(context, "请输入大于等于0的数字！", Toast.LENGTH_SHORT).show();
                                 return;
                             }
                         } catch (NumberFormatException e) {

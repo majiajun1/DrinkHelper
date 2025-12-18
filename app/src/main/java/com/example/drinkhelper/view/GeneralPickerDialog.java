@@ -41,9 +41,8 @@ public class GeneralPickerDialog {
                         if (listener != null) {
 
                             int selectedIndex = picker.getValue();
-                            String selectedItem = items[selectedIndex];
-                            Integer value = Integer.parseInt(selectedItem);
-                            listener.onPicked(value);
+
+                            listener.onPicked(selectedIndex);
                         }
                         dialog.dismiss();
                     }
