@@ -11,8 +11,8 @@
         android:id="@+id/tv_water_title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="今日喝水进度"
+        android:layout_marginTop="5sp"
+        android:text="喝水进度"
         android:textSize="30sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,26 +25,39 @@
         android:id="@+id/tv_water_value"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
         android:text=""
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_water_title" />
+        android:textSize="25sp"
+        app:layout_constraintStart_toStartOf="@id/pb_water"
+        app:layout_constraintEnd_toEndOf="@id/pb_water"
+        app:layout_constraintTop_toTopOf="@id/pb_water"
+        app:layout_constraintBottom_toBottomOf="@id/pb_water" />
 
 
-    <ProgressBar
+<!--    <ProgressBar-->
+<!--        android:id="@+id/pb_water"-->
+<!--        style="?android:attr/progressBarStyleHorizontal"-->
+<!--        android:layout_width="387dp"-->
+<!--        android:layout_height="24dp"-->
+<!--        android:backgroundTint="#E0E0E0"-->
+<!--        android:max="2000"-->
+<!--        android:progress="0"-->
+<!--        android:progressTint="#4CAF50"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/tv_water_value" />-->
+
+
+    <com.example.drinkhelper.view.WaterProgressBar
         android:id="@+id/pb_water"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="387dp"
-        android:layout_height="24dp"
-        android:backgroundTint="#E0E0E0"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:max="2000"
-        android:progress="0"
-        android:progressTint="#4CAF50"
+        android:progress="500"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tv_water_value" />
+        app:layout_constraintTop_toBottomOf="@id/tv_water_title"
+        app:layout_constraintBottom_toTopOf="@id/add_water_button"
+        app:layout_constraintDimensionRatio="1:1" />
 
     <Button
         android:id="@+id/add_water_button"

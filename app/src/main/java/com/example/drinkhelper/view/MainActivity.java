@@ -183,8 +183,8 @@ public class MainActivity extends AppCompatActivity{
 
     private void increaseWaterEvent(OnWaterIncreasedListener listener){
 
-        String[] gap={"50", "100", "150","200", "250","300", "350", "400", "450", "500",};
-        GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 2, new GeneralPickerDialog.PickedListener() {
+        String[] gap={"0","50", "100", "150","200", "250","300", "350", "400", "450", "500",};
+        GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 3, new GeneralPickerDialog.PickedListener() {
             @Override
             public void onPicked(int selectedIndex) {
                 int value = Integer.parseInt(gap[selectedIndex]);
@@ -282,7 +282,7 @@ public class MainActivity extends AppCompatActivity{
     public void setWaterTargetByNumberPicker()
     {
         String[] target={ "100", "200","300", "400", "500","600","700"
-        , "800", "900", "1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000"};
+        , "800", "900", "1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000","2100", "2200", "2300", "2400", "2500", };
         GeneralPickerDialog.show(this, "增加喝水（ml）", target, 14, new GeneralPickerDialog.PickedListener() {
             @Override
             public void onPicked(int selectedIndex) {
