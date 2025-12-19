@@ -43,7 +43,8 @@
         android:layout_marginStart="44dp"
         android:layout_marginTop="16dp"
         android:text="重置"
-        android:textSize="20dp"
+        android:textSize="30sp"
+        android:background="@drawable/btn_reset_timer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_countdown_time" />
 
@@ -53,8 +54,10 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
         android:layout_marginEnd="44dp"
-        android:text="开始"
-        android:textSize="20dp"
+        android:background="@drawable/btn_start_timer"
+        android:text="开始!"
+        android:textStyle="bold"
+        android:textSize="30sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_countdown_time" />
 
@@ -63,9 +66,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="20sp"
         android:text="暂停倒计时"
-        android:textSize="20dp"
+        android:textSize="20sp"
+        android:background="@drawable/btn_pause_timer"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/Reset_button" />
 
@@ -76,7 +80,8 @@
         android:layout_marginTop="20dp"
         android:layout_marginEnd="4dp"
         android:text="设置倒计时间隔"
-        android:textSize="20dp"
+        android:textSize="20sp"
+        android:background="@drawable/btn_set_timer"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/Start_button" />
 

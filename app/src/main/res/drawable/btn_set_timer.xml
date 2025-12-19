@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <!-- 圆角值设为按钮高度的一半（比如按钮高40dp，设20dp），就是胶囊形 -->
+            <corners android:radius="20dp" />
+            <solid android:color="#666699" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <corners android:radius="20dp" />
+            <solid android:color="#99cc66" />
+            <padding
+                android:bottom="10dp"
+                android:left="24dp"
+                android:right="24dp"
+                android:top="10dp" />
+        </shape>
+    </item>
+</selector>

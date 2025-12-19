@@ -258,25 +258,47 @@ public class MainActivity extends AppCompatActivity{
 
     private void setWaterTargetEvent()
     {
-        Integer defaultTarget = waterViewModel.getTargetWater().getValue();
-        if (defaultTarget == null) {
-            defaultTarget = 2000;
-        }
-        showInputDialog(this, "设置目标（ml）", "请输入目标值", defaultTarget, new OnInputConfirmListener() {
+//        Integer defaultTarget = waterViewModel.getTargetWater().getValue();
+//        if (defaultTarget == null) {
+//            defaultTarget = 2000;
+//        }
+//        showInputDialog(this, "设置目标（ml）", "请输入目标值", defaultTarget, new OnInputConfirmListener() {
+//
+//            @Override
+//            public void onConfirm(double inputValue) {
+//                int target = (int) inputValue;
+//                waterViewModel.setTarget(target);
+//                Integer cur = waterViewModel.getCurrentWater().getValue();
+//                if (cur == null) {
+//                    cur = 0;
+//                }
+//                updateWaterDisplay(cur, target);
+//                Toast.makeText(MainActivity.this, "目标已更新为" + target, Toast.LENGTH_SHORT).show();
+//            }
+//        }
+        setWaterTargetByNumberPicker();
+    }
 
+    public void setWaterTargetByNumberPicker()
+    {
+        String[] target={ "100", "200","300", "400", "500","600","700"
+        , "800", "900", "1000", "1100", "1200", "1300", "1400", "1500", "1600", "1700", "1800", "1900", "2000"};
+        GeneralPickerDialog.show(this, "增加喝水（ml）", target, 14, new GeneralPickerDialog.PickedListener() {
             @Override
-            public void onConfirm(double inputValue) {
-                int target = (int) inputValue;
-                waterViewModel.setTarget(target);
-                Integer cur = waterViewModel.getCurrentWater().getValue();
+            public void onPicked(int selectedIndex) {
+                int value = Integer.parseInt(target[selectedIndex]);
+                waterViewModel.setTarget(value);
+                Integer cur=waterViewModel.getCurrentWater().getValue();
                 if (cur == null) {
                     cur = 0;
                 }
-                updateWaterDisplay(cur, target);
-                Toast.makeText(MainActivity.this, "目标已更新为" + target, Toast.LENGTH_SHORT).show();
+                updateWaterDisplay(cur, value);
+
+                Toast.makeText(MainActivity.this, "目标已更新为" + value, Toast.LENGTH_SHORT).show();
+
             }
-        });
-    }
+        });    }
+
 
     private void setCurrentWaterEvent()
     {
