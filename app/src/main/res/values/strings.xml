@@ -1,4 +1,27 @@
 <resources>
     <string name="app_name">DrinkHelper</string>
     <string name="water_value">%1$d ml / %2$d ml</string>
+
+    <string-array name="chicken_soup_list">
+        <item>多喝一口水，少一分疲惫</item>
+        <item>一杯清水，一点清醒</item>
+        <item>水满一点，压力少一点</item>
+        <item>给身体加水，也给灵魂续命</item>
+        <item>慢慢喝水，慢慢变好</item>
+        <item>先把这杯水喝完，再去赢今天</item>
+        <item>会加班，更要会加水</item>
+        <item>身体不是机器，也需要补水</item>
+        <item>喝水是一种温柔的自律</item>
+        <item>照顾好身体，梦想才跑得远</item>
+        <item>每一口水，都是在对自己好</item>
+        <item>忙也要喝水，累也要休息</item>
+        <item>好状态，从一杯温水开始</item>
+        <item>别光刷手机，记得刷一口水</item>
+        <item>对自己好一点，多喝一口水</item>
+        <item>你在努力，细胞也在等水</item>
+        <item>别熬干了自己，先喝点水</item>
+        <item>今天的水没喝够，梦想会口渴</item>
+        <item>喝水不难，难的是坚持喝</item>
+        <item>这一口水，为正在努力的你</item>
+    </string-array>
 </resources>

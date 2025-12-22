@@ -75,6 +75,12 @@ public class MainActivity extends AppCompatActivity{
             }
         });
 
+        waterViewModel.getChickenSoup().observe(this, text -> {
+            if (text != null) {
+                waterCountModuleBinding.tvScrollText.setText(text);
+            }
+        });
+
         timerViewModel.getRemainingMillis().observe(this, millis -> {
             if (millis != null) {
                 updateCountdownText(millis);
@@ -85,6 +91,7 @@ public class MainActivity extends AppCompatActivity{
                 Toast.makeText(MainActivity.this, "该喝水了", Toast.LENGTH_SHORT).show();
                 timesUpAlertSoundEvent();
                 confirmDrinkWaterEvent();
+
                 timerViewModel.ackFinishEvent();
             }
         });
@@ -184,11 +191,12 @@ public class MainActivity extends AppCompatActivity{
     private void increaseWaterEvent(OnWaterIncreasedListener listener){
 
         String[] gap={"0","50", "100", "150","200", "250","300", "350", "400", "450", "500",};
-        GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 3, new GeneralPickerDialog.PickedListener() {
+        GeneralPickerDialog.show(this, "增加喝水（ml）", gap, 2, new GeneralPickerDialog.PickedListener() {
             @Override
             public void onPicked(int selectedIndex) {
                 int value = Integer.parseInt(gap[selectedIndex]);
                 waterViewModel.increase(value);
+                waterViewModel.randomizeChickenSoup();
                 Toast.makeText(MainActivity.this, "已增加" + value + "ml", Toast.LENGTH_SHORT).show();
                 Integer cur = waterViewModel.getCurrentWater().getValue();
                 Integer target = waterViewModel.getTargetWater().getValue();
