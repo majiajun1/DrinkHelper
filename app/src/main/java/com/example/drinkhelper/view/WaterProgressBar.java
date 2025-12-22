@@ -36,7 +36,7 @@ public class WaterProgressBar extends View {
     }
 
     private void init() {
-        strokeWidth = dpToPx(12f);
+        strokeWidth = dpToPx(15f);
         backgroundPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
         backgroundPaint.setStyle(Paint.Style.STROKE);
         backgroundPaint.setStrokeWidth(strokeWidth);
