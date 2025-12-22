@@ -36,16 +36,23 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/guideline_center"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintGuide_percent="0.5"
+        android:orientation="vertical" />
+
     <Button
         android:id="@+id/Reset_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="44dp"
         android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
         android:text="重置"
         android:textSize="30sp"
         android:background="@drawable/btn_reset_timer"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline_center"
         app:layout_constraintTop_toBottomOf="@id/tv_countdown_time" />
 
     <Button
@@ -53,36 +60,48 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="44dp"
+        android:layout_marginStart="20dp"
         android:background="@drawable/btn_start_timer"
         android:text="开始!"
         android:textStyle="bold"
         android:textSize="30sp"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/guideline_center"
         app:layout_constraintTop_toBottomOf="@id/tv_countdown_time" />
 
     <Button
         android:id="@+id/Pause_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="20sp"
+        android:layout_marginEnd="20dp"
         android:text="暂停倒计时"
         android:textSize="20sp"
         android:background="@drawable/btn_pause_timer"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/guideline_center"
         app:layout_constraintTop_toBottomOf="@id/Reset_button" />
 
-    <Button
-        android:id="@+id/SetTime_button"
-        android:layout_width="wrap_content"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_settime_container"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="4dp"
-        android:text="设置倒计时间隔"
-        android:textSize="20sp"
-        android:background="@drawable/btn_set_timer"
+        app:layout_constraintStart_toEndOf="@id/guideline_center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/Start_button" />
+        app:layout_constraintTop_toBottomOf="@id/Reset_button">
+
+        <Button
+            android:id="@+id/SetTime_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:text="设置倒计时间隔"
+            android:textSize="20sp"
+            android:background="@drawable/btn_set_timer"
+            android:maxWidth="150dp"
+            android:maxLines="3"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
