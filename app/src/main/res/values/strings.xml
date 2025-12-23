@@ -24,4 +24,12 @@
         <item>喝水不难，难的是坚持喝</item>
         <item>这一口水，为正在努力的你</item>
     </string-array>
+
+    <string-array name="alert_type_entries">
+        <item>仅震动</item>
+        <item>震动加铃声</item>
+        <item>仅铃声</item>
+        <item>仅通知提示音</item>
+        <item>震动加通知提示音</item>
+    </string-array>
 </resources>

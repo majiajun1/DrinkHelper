@@ -21,8 +21,8 @@
         <option name="selectionMode" value="DROPDOWN" />
       </SelectionState>
       <SelectionState runConfigName="MainActivity (2)">
-        <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-12-23T07:16:05.953730Z">
+        <option name="selectionMode" value="DIALOG" />
+        <DropdownSelection timestamp="2025-12-23T10:35:22.859290Z">
           <Target type="DEFAULT_BOOT">
             <handle>
               <DeviceId pluginId="PhysicalDevice" identifier="serial=1357f08c" />
@@ -34,16 +34,6 @@
             <Target type="DEFAULT_BOOT">
               <handle>
                 <DeviceId pluginId="PhysicalDevice" identifier="serial=1357f08c" />
-              </handle>
-            </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=/Users/jiajun/.android/avd/Medium_Phone.avd" />
-              </handle>
-            </Target>
-            <Target type="DEFAULT_BOOT">
-              <handle>
-                <DeviceId pluginId="LocalEmulator" identifier="path=/Users/jiajun/.android/avd/Small_Phone.avd" />
               </handle>
             </Target>
           </targets>
