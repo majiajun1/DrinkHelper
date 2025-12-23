@@ -19,10 +19,12 @@ public class TimerViewModel extends AndroidViewModel {
     private CountDownTimer countDownTimer;
     private final SharedPreferences prefs;
 
+    public static final String STRING_TIME_LENGTH_MILLIS = "timeLengthMillis";
+
     public TimerViewModel(Application application) {
         super(application);
-        prefs = application.getSharedPreferences("drink_prefs", Context.MODE_PRIVATE);
-        int savedLen = prefs.getInt("timeLengthMillis", 30 * 60 * 1000);
+        prefs = application.getSharedPreferences(SettingsViewModel.STRING_PREFS_NAME, Context.MODE_PRIVATE);
+        int savedLen = prefs.getInt(STRING_TIME_LENGTH_MILLIS, 30 * 60 * 1000);
         timeLengthMillis.setValue(savedLen);
         remainingMillis.setValue(savedLen);
     }
@@ -49,7 +51,7 @@ public class TimerViewModel extends AndroidViewModel {
         }
         int millis = (int) (minutes * 60 * 1000);
         timeLengthMillis.setValue(millis);
-        prefs.edit().putInt("timeLengthMillis", millis).apply();
+        prefs.edit().putInt(STRING_TIME_LENGTH_MILLIS, millis).apply();
         resetInternal(millis);
     }
 

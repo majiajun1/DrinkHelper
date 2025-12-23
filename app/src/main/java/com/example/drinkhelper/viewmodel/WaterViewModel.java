@@ -21,12 +21,15 @@ public class WaterViewModel extends AndroidViewModel {
     private final MutableLiveData<String> chickenSoup= new MutableLiveData<>();
 
 
+    public static final String STRING_TARGET_WATER = "targetWater";
+    public static final String STRING_CURRENT_WATER = "currentWater";
+    public static final String STRING_CHICKEN_SOUP = "chickenSoup";
 
     public WaterViewModel(Application application) {
         super(application);
-        prefs = application.getSharedPreferences("drink_prefs", Context.MODE_PRIVATE);
-        int savedCurrent = prefs.getInt("currentWater", 0);
-        int savedTarget = prefs.getInt("targetWater", 2000);
+        prefs = application.getSharedPreferences(SettingsViewModel.STRING_PREFS_NAME, Context.MODE_PRIVATE);
+        int savedCurrent = prefs.getInt(STRING_CURRENT_WATER, 0);
+        int savedTarget = prefs.getInt(STRING_TARGET_WATER, 2000);
         currentWater.setValue(savedCurrent);
         targetWater.setValue(savedTarget);
         initChickenSoup();
@@ -45,7 +48,7 @@ public class WaterViewModel extends AndroidViewModel {
             return;
         }
         targetWater.setValue(target);
-        prefs.edit().putInt("targetWater", target).apply();
+        prefs.edit().putInt(STRING_TARGET_WATER, target).apply();
     }
 
     public void setChickenSoup(String chickenSoup) {
@@ -77,7 +80,7 @@ public class WaterViewModel extends AndroidViewModel {
             current = 0;
         }
         currentWater.setValue(current);
-        prefs.edit().putInt("currentWater", current).apply();
+        prefs.edit().putInt(STRING_CURRENT_WATER, current).apply();
     }
 
     public void increase(int delta) {

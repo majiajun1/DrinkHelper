@@ -26,6 +26,7 @@ import com.example.drinkhelper.databinding.TimeModuleBinding;
 import com.example.drinkhelper.databinding.WaterCountModuleBinding;
 import com.example.drinkhelper.viewmodel.TimerViewModel;
 import com.example.drinkhelper.viewmodel.WaterViewModel;
+import com.example.drinkhelper.viewmodel.SettingsViewModel;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -37,6 +38,7 @@ public class MainActivity extends AppCompatActivity{
 
     private WaterViewModel waterViewModel;
     private TimerViewModel timerViewModel;
+    private SettingsViewModel settingsViewModel;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity{
 
         waterViewModel = new ViewModelProvider(this).get(WaterViewModel.class);
         timerViewModel = new ViewModelProvider(this).get(TimerViewModel.class);
+        settingsViewModel = new ViewModelProvider(this).get(SettingsViewModel.class);
 
         waterViewModel.getTargetWater().observe(this, value -> {
             if (value != null) {
@@ -112,6 +115,12 @@ public class MainActivity extends AppCompatActivity{
             timerViewModel.pause();
             Toast.makeText(MainActivity.this, "已暂停", Toast.LENGTH_SHORT).show();
         });
+
+        timeModuleBinding.btnSettings.setOnClickListener(v -> openSettings());
+    }
+
+    private void openSettings() {
+        Toast.makeText(this, "设置功能开发中", Toast.LENGTH_SHORT).show();
     }
 
 
